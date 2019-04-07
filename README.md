@@ -18,5 +18,5 @@ Teste de equivalência:
 ~~~~~~~~~~~~~~~~~~~~~~
 Quando todas as transações estão prontas, é procurado uma visão que seja equivalente.
 
-Para cada visão, é testado se alguma das transações contém algum conflito, caso todas as transações sejam equivalentes uma visão foi encontrada é o escalonamento é equivalente.
-~~~~~~~~~~~~~~~~~~~
+Para cada visão, é testado se alguma das transações contém algum conflito. 
+Caso todas as transações sejam equivalentes uma visão foi encontrada é o escalonamento é equivalente.
