@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt_BR">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Transacao.py &#8212; documentação Trabalho BD </title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Buscar" href="search.html" />
+    <link rel="prev" title="Escalonamento de Transações" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="transacao-py">
+<h1>Transacao.py<a class="headerlink" href="#transacao-py" title="Link permanente para este título">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">class</span> <span class="nc">Transacao</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;Classe que representa uma transação, armazena as operações e relações do grafo.&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">escalonamento</span><span class="p">):</span>
+		<span class="c1"># o escalonamento a que essa transação pertence</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">escalonamento</span> <span class="o">=</span> <span class="n">escalonamento</span>
+		<span class="c1"># se já realizou commit</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pronta</span> <span class="o">=</span> <span class="kc">False</span>
+		<span class="c1"># vizinhos no grafo</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">vizinhos</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="c1"># operações realizadas</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">acoes</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="c1"># estado para busca de ciclos</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="c1"># possíveis operações</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">operacoes</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ler</span><span class="p">,</span>
+			<span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">escrever</span><span class="p">,</span>
+			<span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">commit</span>
+		<span class="p">}</span>
+		<span class="c1"># id da transação</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+
+	<span class="k">def</span> <span class="nf">adicionaVizinho</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vizinho</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Se vizinho ainda não é vizinho de self, adiciona vizinho na em self.vizinhos&quot;&quot;&quot;</span>
+		<span class="c1"># se já não é vizinho</span>
+		<span class="k">if</span> <span class="n">vizinho</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vizinhos</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">vizinhos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vizinho</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">detectaCiclo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Método recursiva para encontrar ciclo no grafo&quot;&quot;&quot;</span>
+		<span class="c1"># se é vizinho de nodo já visitado, tem ciclo</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estado</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="k">return</span> <span class="kc">True</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">1</span>
+		<span class="n">resultado</span> <span class="o">=</span> <span class="kc">False</span>
+		<span class="c1"># verifica se algum vizinho detecta ciclo</span>
+		<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vizinhos</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">estado</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+				<span class="n">resultado</span> <span class="o">=</span> <span class="n">resultado</span> <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">detectaCiclo</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">2</span>
+		<span class="k">return</span> <span class="n">resultado</span>
+
+	<span class="k">def</span> <span class="nf">escrever</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acao</span><span class="p">,</span> <span class="n">atributo</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Método para tratar operação de escrita (W)&quot;&quot;&quot;</span>
+		<span class="c1"># para toda transação t</span>
+		<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalonamento</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+			<span class="c1"># se não for ela</span>
+			<span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">:</span>
+				<span class="n">w</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+				<span class="n">r</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+				<span class="c1"># se transação t escreve ou lê atributo antes</span>
+				<span class="k">if</span> <span class="p">(</span><span class="n">w</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="n">acao</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">r</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">acao</span><span class="p">):</span>
+					<span class="c1"># print (self.id, acao, atributo, w, r, t.id)</span>
+					<span class="n">t</span><span class="o">.</span><span class="n">adicionaVizinho</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">ler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acao</span><span class="p">,</span> <span class="n">atributo</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Método para tratar operação de leitura (R)&quot;&quot;&quot;</span>
+		<span class="c1"># para toda transação t</span>
+		<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalonamento</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+			<span class="c1"># se não for ela</span>
+			<span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">:</span>
+				<span class="n">index_w</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+				<span class="c1"># se transação t escreve no atributo antes</span>
+				<span class="k">if</span> <span class="p">(</span><span class="n">index_w</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">index_w</span> <span class="o">&lt;</span> <span class="n">acao</span><span class="p">):</span>
+					<span class="n">t</span><span class="o">.</span><span class="n">adicionaVizinho</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tempo</span><span class="p">,</span> <span class="n">atributo</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Método para tratar operação de commit (C)&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">pronta</span> <span class="o">=</span> <span class="kc">True</span>
+
+	<span class="k">def</span> <span class="nf">realiza</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tempo</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">atributo</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Faz o processamento necessário para adicionar a operação op&quot;&quot;&quot;</span>
+		<span class="c1"># adiciona a operação nas ações</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">acoes</span><span class="p">[</span><span class="n">tempo</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+		<span class="c1"># executa a operação correspondente</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">operacoes</span><span class="p">[</span><span class="n">op</span><span class="p">](</span><span class="n">tempo</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">naoEquivale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Verifica se self pode ser equivalente ao escalonamento serial&quot;&quot;&quot;</span>
+		<span class="c1"># para todas as ações</span>
+		<span class="k">for</span> <span class="n">acao</span><span class="p">,</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acoes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+			<span class="c1"># se for leitura</span>
+			<span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+				<span class="c1"># filtra transações com operação de escrita no atributo antes e ordena</span>
+				<span class="n">tp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalonamento</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+				<span class="n">tp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">acao</span><span class="p">,</span> <span class="n">tp</span><span class="p">)</span>
+				<span class="n">tp</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">))</span>
+				<span class="c1"># pega a última transação com escrita em atr</span>
+				<span class="n">transacao_p</span> <span class="o">=</span> <span class="kc">False</span>
+				<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="n">transacao_p</span> <span class="o">=</span> <span class="n">tp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+				<span class="c1"># filtra da visão todas as ações que escrevem em atr</span>
+				<span class="n">ts</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">serial</span><span class="p">[:</span><span class="n">serial</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)])</span>
+				<span class="c1"># pega a última transação com escrita em atr</span>
+				<span class="n">transacao_s</span> <span class="o">=</span> <span class="kc">False</span>
+				<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="n">transacao_s</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+				<span class="c1"># se existe escrita antes no escalonamento e é diferente do serial</span>
+				<span class="k">if</span> <span class="p">(</span><span class="n">transacao_p</span> <span class="o">!=</span> <span class="n">transacao_s</span><span class="p">):</span>
+					<span class="k">return</span> <span class="kc">True</span>
+
+			<span class="c1"># se for escrita</span>
+			<span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span>
+				<span class="c1"># filtra transações com operação de escrita no atributo antes e ordena</span>
+				<span class="n">tp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalonamento</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+				<span class="n">tp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">acao</span><span class="p">,</span> <span class="n">tp</span><span class="p">)</span>
+
+				<span class="c1"># se é o último a escrever</span>
+				<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="c1"># para todas as transações seriais após</span>
+					<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">serial</span><span class="p">[</span><span class="n">serial</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:]:</span>
+						<span class="c1"># se escrever no atributo</span>
+						<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">indexAcao</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">atr</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+							<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">return</span> <span class="kc">False</span>
+
+	<span class="k">def</span> <span class="nf">indexAcao</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">atr</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Retorna o primeiro indíce em que é feita uma operação do tipo op no atributo atr&quot;&quot;&quot;</span>
+		<span class="c1"># para toda ação</span>
+		<span class="k">for</span> <span class="n">chave</span><span class="p">,</span> <span class="n">valor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acoes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+			<span class="c1"># se operação e atributo correspondem</span>
+			<span class="k">if</span> <span class="n">valor</span> <span class="o">==</span> <span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">atr</span><span class="p">):</span>
+				<span class="k">return</span> <span class="n">chave</span>
+		<span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="main-py">
+<h1>main.py<a class="headerlink" href="#main-py" title="Link permanente para este título">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python2.7</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">Transacao</span> <span class="k">import</span> <span class="n">Transacao</span>
+<span class="kn">import</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">sys</span>
+
+<span class="n">id_escalonamento</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">transacoes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">def</span> <span class="nf">equivaleSerial</span><span class="p">(</span><span class="n">transacoes</span><span class="p">):</span>
+    <span class="n">equivale</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># para todo permutação</span>
+    <span class="k">for</span> <span class="n">serial</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">transacoes</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="n">equivale</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># para todas as transações</span>
+        <span class="k">for</span> <span class="n">valor</span> <span class="ow">in</span> <span class="n">transacoes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c1"># se não equivale a visão</span>
+            <span class="k">if</span> <span class="n">valor</span><span class="o">.</span><span class="n">naoEquivale</span><span class="p">(</span><span class="n">serial</span><span class="p">):</span>
+                <span class="n">equivale</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">equivale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+<span class="c1"># para todas as linhas da entrada</span>
+<span class="k">for</span> <span class="n">linha</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">:</span>
+    <span class="c1"># lê a linha</span>
+    <span class="n">tempo</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">atributo</span> <span class="o">=</span> <span class="n">linha</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+
+    <span class="c1"># se transação ainda não existe</span>
+    <span class="k">if</span> <span class="nb">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transacoes</span><span class="p">:</span>
+        <span class="n">transacoes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">Transacao</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">transacoes</span><span class="p">)</span>
+    <span class="c1"># processa a operação</span>
+    <span class="n">transacoes</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">realiza</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tempo</span><span class="p">),</span> <span class="n">op</span><span class="p">,</span> <span class="n">atributo</span><span class="p">)</span>
+
+    <span class="c1"># verifica se todas as transações deram commit</span>
+    <span class="n">todas</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">pronta</span><span class="p">,</span> <span class="n">transacoes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">todas</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="p">,</span> <span class="n">todas</span><span class="p">)</span>
+
+    <span class="c1"># se todas estão prontas</span>
+    <span class="k">if</span> <span class="n">todas</span><span class="p">:</span>
+        <span class="n">resultado</span> <span class="o">=</span> <span class="s2">&quot;SS&quot;</span>
+        <span class="c1"># busca ciclo</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">transacoes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">estado</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">detectaCiclo</span><span class="p">():</span>
+                    <span class="n">resultado</span> <span class="o">=</span> <span class="s2">&quot;NS&quot;</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># se equivale a alguma visão</span>
+        <span class="n">resultado</span> <span class="o">+=</span> <span class="s2">&quot; SV&quot;</span> <span class="k">if</span> <span class="n">equivaleSerial</span><span class="p">(</span><span class="n">transacoes</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot; NV&quot;</span>
+
+        <span class="c1"># monta a saída</span>
+        <span class="n">chaves</span> <span class="o">=</span> <span class="n">transacoes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">chaves</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">chaves</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">chaves</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">id_escalonamento</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chaves</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">resultado</span><span class="p">)</span>
+
+        <span class="c1"># prepara para próximo escalonamento</span>
+        <span class="n">id_escalonamento</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">transacoes</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Gabriel de Souza Barreto, Guilherme Bastos de Oliveira.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/codigo.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

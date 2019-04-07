@@ -1,0 +1,90 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt_BR">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Trabalho Sistemas Banco de Dados &#8212; documentação Trabalho BD </title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Buscar" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="trabalho-sistemas-banco-de-dados">
+<h1>Trabalho Sistemas Banco de Dados<a class="headerlink" href="#trabalho-sistemas-banco-de-dados" title="Link permanente para este título">¶</a></h1>
+</div>
+<div class="section" id="escalonamento-de-transacoes">
+<h1>Escalonamento de Transações<a class="headerlink" href="#escalonamento-de-transacoes" title="Link permanente para este título">¶</a></h1>
+<div class="section" id="alunos">
+<h2>Alunos:<a class="headerlink" href="#alunos" title="Link permanente para este título">¶</a></h2>
+<ul class="simple">
+<li>Gabriel de Souza Barreto</li>
+<li>Guilherme Bastos de Oliveira</li>
+</ul>
+</div>
+<div class="section" id="deteccao-de-ciclos">
+<h2>Detecção de ciclos:<a class="headerlink" href="#deteccao-de-ciclos" title="Link permanente para este título">¶</a></h2>
+<p>Para detectar os ciclos foi utilizado o algorito de Busca em Profundidade, implementado de maneira recursiva no método <strong>Transacao.detectaCiclo()</strong>.</p>
+<p>Cada objeto <strong>Transacao</strong> é considerado um vértice, e a cada operação realizada é adicionado o arco se necessário.</p>
+</div>
+<div class="section" id="teste-de-equivalencia">
+<h2>Teste de equivalência:<a class="headerlink" href="#teste-de-equivalencia" title="Link permanente para este título">¶</a></h2>
+<p>Quando todas as transações estão prontas, é procurado uma visão que seja equivalente.</p>
+<p>Para cada visão, é testado se alguma das transações contém algum conflito, caso todas as transações sejam equivalentes uma visão foi encontrada é o escalonamento é equivalente.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+
+<h3><a href="index.html">Início</a></h3>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Gabriel de Souza Barreto, Guilherme Bastos de Oliveira.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/relatorio.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
